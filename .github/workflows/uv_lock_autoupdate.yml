@@ -56,7 +56,9 @@ jobs:
       - name: Store hash of baseline files for comparison
         id: old_hash
         run: |
+          echo "lockfile=$( sha256sum $lockfile_path )"
           echo "lockfile=$( sha256sum $lockfile_path )" >> $GITHUB_OUTPUT
+          echo "requirements_doc=$( sha256sum $requirements_doc_path )"
           echo "requirements_doc=$( sha256sum $requirements_doc_path )" >> $GITHUB_OUTPUT
       - name: Overwrite config on branch with version from main
         run: |
@@ -65,7 +67,9 @@ jobs:
       - name: Store hash of main files for comparison
         id: main_hash
         run: |
+          echo "lockfile=$( sha256sum $lockfile_path )"
           echo "lockfile=$( sha256sum $lockfile_path )" >> $GITHUB_OUTPUT
+          echo "requirements_doc=$( sha256sum $requirements_doc_path )"
           echo "requirements_doc=$( sha256sum $requirements_doc_path )" >> $GITHUB_OUTPUT
       - name: Run `uv lock --upgrade` on main lockfile
         id: autoupdate
@@ -86,14 +90,10 @@ jobs:
       - name: Store hash of new files for comparison
         id: new_hash
         run: |
+          echo "lockfile=$( sha256sum $lockfile_path )"
           echo "lockfile=$( sha256sum $lockfile_path )" >> $GITHUB_OUTPUT
+          echo "requirements_doc=$( sha256sum $requirements_doc_path )"
           echo "requirements_doc=$( sha256sum $requirements_doc_path )" >> $GITHUB_OUTPUT
-      - name: Debug - show hashes
-        run: |
-          echo "old_lockfile: ${{ steps.old_hash.outputs.lockfile }}
-          echo "new_lockfile: ${{ steps.new_hash.outputs.lockfile }}
-          echo "old_requirements_docs: ${{ steps.old_hash.outputs.requirements_docs }}
-          echo "new_requirements_docs: ${{ steps.new_hash.outputs.requirements_docs }}
       # Commit authoring and pull-request creation/updating
       - name: Commit (with signature) lockfile
         id: commit_lockfile
