@@ -19,7 +19,7 @@ jobs:
 #          private-key: ${{ secrets.WRITE_CONTENTS_PR_KEY }}
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: rg_main
       - name: Create or checkout update branch
         id: create_branch
         run: |
@@ -58,8 +58,8 @@ jobs:
           echo "requirements_doc=$( sha256sum $requirements_doc_path )" >> $GITHUB_OUTPUT
       - name: Overwrite config on branch with version from main
         run: |
-          git checkout main ${{ env.lockfile_path }}
-          git checkout main ${{ env.requirements_doc_path }}
+          git checkout rg_main ${{ env.lockfile_path }}
+          git checkout rg_main ${{ env.requirements_doc_path }}
       - name: Store hash of main files for comparison
         id: main_hash
         run: |
@@ -128,5 +128,5 @@ jobs:
               --field body="$body"
           else
             # If a PR doesn't already exist, and no previous PR can be reopened, create a new PR.
-            gh pr create -t "$title" -b "$body" -l dependencies -B main -H ${{ env.update_branch }}
+            gh pr create -t "$title" -b "$body" -l dependencies -B rg_main -H ${{ env.update_branch }}
           fi
