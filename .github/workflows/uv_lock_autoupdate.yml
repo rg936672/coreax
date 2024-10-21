@@ -1,9 +1,6 @@
 name: Autoupdate uv lock file
 
-on:
-  schedule:
-    # Every Sunday at 00:00.
-    - cron: "0 0 * * 0"
+on: workflow_dispatch
 
 jobs:
   uv_lock_autoupdate:
