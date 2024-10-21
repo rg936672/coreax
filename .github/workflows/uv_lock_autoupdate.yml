@@ -11,19 +11,19 @@ jobs:
       update_branch: chore/uv-lock-autoupdate
     runs-on: ubuntu-latest
     steps:
-      - name: Generate a token
-        id: generate-token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ vars.WRITE_CONTENTS_PR_APP }}
-          private-key: ${{ secrets.WRITE_CONTENTS_PR_KEY }}
+#      - name: Generate a token
+#        id: generate-token
+#        uses: actions/create-github-app-token@v1
+#        with:
+#          app-id: ${{ vars.WRITE_CONTENTS_PR_APP }}
+#          private-key: ${{ secrets.WRITE_CONTENTS_PR_KEY }}
       - uses: actions/checkout@v4
         with:
           ref: rg_main
       - name: Create or checkout update branch
         id: create_branch
         env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           export pr_number=$( gh pr view ${{ env.update_branch }} --json number --jq '.number' )
           export pr_state=$( gh pr view ${{ env.update_branch }} --json state --jq '.state' )
@@ -93,7 +93,7 @@ jobs:
         id: commit_lockfile
         if: steps.old_hash.outputs.lockfile != steps.new_hash.outputs.lockfile
         env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           export message="chore(deps): autoupdate uv.lock"
           export sha=$( git rev-parse ${{ env.update_branch }}:${{ env.lockfile_path }} )
@@ -107,7 +107,7 @@ jobs:
         id: commit_requirements_doc
         if: steps.old_hash.outputs.requirements_doc != steps.new_hash.outputs.requirements_doc
         env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           export message="chore(deps): autoupdate requirements-doc"
           export sha=$( git rev-parse ${{ env.update_branch }}:${{ env.requirements_doc_path }} )
@@ -122,7 +122,7 @@ jobs:
         # requirements-doc should only change if the lockfile also changes
         if: steps.commit_lockfile.conclusion == 'success' || ( steps.main_lockfile.outputs.hash != steps.new_lockfile.outputs.hash )
         env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           export title="chore(deps): autoupdate uv.lock"
           export body=$( cat ${{ env.update_message_path }} )
